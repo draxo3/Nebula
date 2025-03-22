@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nebula</title>
     <style>
+        /* Base styles */
         body {
             background-color: #000;
             color: #fff;
@@ -14,79 +15,815 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .snow-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .snowflake {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-5vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(105vh) translateX(20px);
+                opacity: 0.3;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         .title {
             font-size: 4rem;
-            margin-top: 2rem;
             text-align: center;
             color: #fff;
             text-shadow: 0 0 10px #9d4edd, 0 0 20px #9d4edd, 0 0 30px #9d4edd;
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Search and cart bar */
+        .search-cart-container {
+            display: flex;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2.5rem;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            background-color: transparent;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #9d4edd;
+            box-shadow: 0 0 5px rgba(157, 78, 221, 0.5);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+
+        .cart-container {
+            position: relative;
+        }
+
+        .cart-icon {
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .cart-icon:hover {
+            border-color: #9d4edd;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #9d4edd;
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .wishlist-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            width: 300px;
+            background-color: rgba(17, 17, 17, 0.95);
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            z-index: 100;
+            display: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wishlist-dropdown.active {
+            display: block;
+        }
+
+        .wishlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wishlist-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .wishlist-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .wishlist-items {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .wishlist-empty {
+            text-align: center;
+            padding: 20px 0;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .wishlist-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wishlist-item-image {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            margin-right: 10px;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .wishlist-item-details {
+            flex: 1;
+        }
+
+        .wishlist-item-name {
+            font-size: 14px;
+            margin: 0 0 5px 0;
+        }
+
+        .wishlist-item-price {
+            font-size: 14px;
+            color: #9d4edd;
+            margin: 0;
+        }
+
+        .wishlist-item-remove {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .wishlist-item-remove:hover {
+            color: #ff5555;
         }
 
         .keys-container {
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 2rem;
-            margin: 0 auto;
-            max-width: 1200px;
-            padding: 0 1rem;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
         .key-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .key-item:hover {
+            transform: scale(1.05);
         }
 
         .key-image {
-            width: 200px;
-            height: 200px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
             border-radius: 10px;
             box-shadow: 0 0 10px #fff, 0 0 15px #fff;
             margin-bottom: 1rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
         }
 
         .key-label {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             text-align: center;
             margin-top: 0.5rem;
         }
 
+        .add-to-wishlist {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-to-wishlist:hover {
+            background-color: #9d4edd;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: rgba(17, 17, 17, 0.95);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 0 20px #9d4edd, 0 0 30px #9d4edd;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 1rem;
+        }
+
+        .modal-header img {
+            width: 60px;
+            height: 60px;
+            margin-right: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .modal-price {
+            font-size: 2rem;
+            color: #9d4edd;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+
+        .modal-description {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .features-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .features-list li:before {
+            content: "✓";
+            color: #9d4edd;
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        .limited-tag {
+            background-color: #9d4edd;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .purchase-btn {
+            background: #444;
+            color: #aaa;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            width: 100%;
+            font-weight: bold;
+            position: relative;
+            cursor: not-allowed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stop-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ff5555;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .stop-icon:before {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 2px;
+            background-color: #ff5555;
+            transform: rotate(45deg);
+        }
+
+        .stop-icon:after {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 2px;
+            background-color: #ff5555;
+            transform: rotate(-45deg);
+        }
+
+        /* Responsive design */
         @media (max-width: 768px) {
-            .keys-container {
-                flex-direction: column;
-            }
-            
             .title {
                 font-size: 3rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .search-cart-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .cart-container {
+                align-self: flex-end;
+            }
+            
+            .wishlist-dropdown {
+                width: 280px;
+                right: -10px;
+            }
+            
+            .keys-container {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            
+            .key-image {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .modal-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .key-image {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .key-label {
+                font-size: 1rem;
+            }
+            
+            .modal {
+                padding: 1.5rem;
+            }
+            
+            .modal-price {
+                font-size: 1.8rem;
+            }
+            
+            .wishlist-dropdown {
+                width: 250px;
             }
         }
     </style>
 </head>
 <body>
-    <h1 class="title">Nebula</h1>
-    
-    <div class="keys-container">
-        <div class="key-item">
-            <img src="/placeholder.svg?height=200&width=200" alt="1 Week Key" class="key-image">
-            <div class="key-label">1 Week Key</div>
+    <!-- Animated Background -->
+    <div class="background">
+        <div class="snow-container" id="snow-container"></div>
+    </div>
+
+    <div class="container">
+        <h1 class="title">Nebula</h1>
+        
+        <!-- Search and Cart Bar -->
+        <div class="search-cart-container">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search products...">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+            
+            <div class="cart-container">
+                <div class="cart-icon" onclick="toggleWishlist()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4"></path>
+                    </svg>
+                </div>
+                <div class="cart-count" id="wishlist-count">0</div>
+                
+                <!-- Wishlist Dropdown -->
+                <div class="wishlist-dropdown" id="wishlist-dropdown">
+                    <div class="wishlist-header">
+                        <h3 class="wishlist-title">Wishlist</h3>
+                        <button class="wishlist-close" onclick="toggleWishlist()">×</button>
+                    </div>
+                    <div class="wishlist-items" id="wishlist-items">
+                        <div class="wishlist-empty" id="wishlist-empty">Your wishlist is empty</div>
+                        <!-- Wishlist items will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <div class="key-item">
-            <img src="/placeholder.svg?height=200&width=200" alt="1 Month Key" class="key-image">
-            <div class="key-label">1 Month Key</div>
-        </div>
-        
-        <div class="key-item">
-            <img src="/placeholder.svg?height=200&width=200" alt="6 Months Key" class="key-image">
-            <div class="key-label">6 Months Key</div>
+        <div class="keys-container">
+            <div class="key-item" onclick="openModal('week')">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png" alt="1 Week Key" class="key-image">
+                <div class="key-label">1 Week Key</div>
+                <button class="add-to-wishlist" onclick="addToWishlist(event, 'week')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="key-item" onclick="openModal('month')">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png" alt="1 Month Key" class="key-image">
+                <div class="key-label">1 Month Key</div>
+                <button class="add-to-wishlist" onclick="addToWishlist(event, 'month')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="key-item" onclick="openModal('sixmonth')">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png" alt="6 Months Key" class="key-image">
+                <div class="key-label">6 Months Key</div>
+                <button class="add-to-wishlist" onclick="addToWishlist(event, 'sixmonth')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
+
+    <!-- Modal Overlays -->
+    <div class="modal-overlay" id="modal-week">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('week')">×</button>
+            <div class="modal-header">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png" alt="1 Week Key">
+                <h2 class="modal-title">Nebula 1 Week Access Key</h2>
+            </div>
+            <div class="modal-price">$2.00</div>
+            <div class="modal-description">
+                Get full access to Nebula for one week. Perfect for trying out all premium features.
+            </div>
+            <ul class="features-list">
+                <li>Full access to all Nebula features</li>
+                <li>24/7 customer support</li>
+                <li>1 month extra Bonus <span class="limited-tag">LIMITED</span></li>
+            </ul>
+            <button class="purchase-btn">
+                <span class="stop-icon"></span>
+                Out of Stock
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-month">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('month')">×</button>
+            <div class="modal-header">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png" alt="1 Month Key">
+                <h2 class="modal-title">Nebula 1 Month Access Key</h2>
+            </div>
+            <div class="modal-price">$5.00</div>
+            <div class="modal-description">
+                Our most popular option. Get full access to Nebula for a full month at a great value.
+            </div>
+            <ul class="features-list">
+                <li>Full access to all Nebula features</li>
+                <li>Priority customer support</li>
+                <li>1 month extra Bonus <span class="limited-tag">LIMITED</span></li>
+                <li>Access to exclusive monthly content</li>
+            </ul>
+            <button class="purchase-btn">
+                <span class="stop-icon"></span>
+                Out of Stock
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-sixmonth">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('sixmonth')">×</button>
+            <div class="modal-header">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png" alt="6 Months Key">
+                <h2 class="modal-title">Nebula 6 Months Access Key</h2>
+            </div>
+            <div class="modal-price">$10.00</div>
+            <div class="modal-description">
+                Our best value package. Get full access to Nebula for six months with premium benefits.
+            </div>
+            <ul class="features-list">
+                <li>Full access to all Nebula features</li>
+                <li>VIP customer support</li>
+                <li>1 month extra Bonus <span class="limited-tag">LIMITED</span></li>
+                <li>Access to exclusive monthly content</li>
+                <li>Early access to new features</li>
+                <li>25% discount on next renewal</li>
+            </ul>
+            <button class="purchase-btn">
+                <span class="stop-icon"></span>
+                Out of Stock
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Create falling snow particles
+        function createSnow() {
+            const container = document.getElementById('snow-container');
+            const count = 150;
+            
+            for (let i = 0; i < count; i++) {
+                createSnowflake(container);
+            }
+        }
+        
+        function createSnowflake(container) {
+            const snowflake = document.createElement('div');
+            const size = Math.random() * 3 + 1; // Size between 1-4px
+            const startPositionX = Math.random() * 100; // Random X position
+            const duration = Math.random() * 10 + 10; // Fall duration between 10-20s
+            const delay = Math.random() * 10; // Random delay for natural effect
+            
+            snowflake.className = 'snowflake';
+            snowflake.style.width = `${size}px`;
+            snowflake.style.height = `${size}px`;
+            snowflake.style.left = `${startPositionX}%`;
+            snowflake.style.top = '0';
+            snowflake.style.animation = `fall ${duration}s linear ${delay}s infinite`;
+            
+            container.appendChild(snowflake);
+        }
+        
+        // Modal functions
+        function openModal(type) {
+            document.getElementById('modal-' + type).classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        }
+        
+        function closeModal(type) {
+            document.getElementById('modal-' + type).classList.remove('active');
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        }
+        
+        // Close modal when clicking outside of it
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+        
+        // Wishlist functionality
+        let wishlistItems = [];
+        const products = {
+            'week': {
+                id: 'week',
+                name: 'Nebula 1 Week Access Key',
+                price: '$2.00',
+                image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png'
+            },
+            'month': {
+                id: 'month',
+                name: 'Nebula 1 Month Access Key',
+                price: '$5.00',
+                image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png'
+            },
+            'sixmonth': {
+                id: 'sixmonth',
+                name: 'Nebula 6 Months Access Key',
+                price: '$10.00',
+                image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/key-uKWnAejMgrE0GvlAwDdeipPomr3i7b.png'
+            }
+        };
+        
+        function toggleWishlist() {
+            const wishlistDropdown = document.getElementById('wishlist-dropdown');
+            wishlistDropdown.classList.toggle('active');
+        }
+        
+        function addToWishlist(event, productId) {
+            event.stopPropagation(); // Prevent opening the modal
+            
+            // Check if product is already in wishlist
+            if (!wishlistItems.includes(productId)) {
+                wishlistItems.push(productId);
+                updateWishlistUI();
+            }
+        }
+        
+        function removeFromWishlist(productId) {
+            wishlistItems = wishlistItems.filter(id => id !== productId);
+            updateWishlistUI();
+        }
+        
+        function updateWishlistUI() {
+            const wishlistCount = document.getElementById('wishlist-count');
+            const wishlistItemsContainer = document.getElementById('wishlist-items');
+            const wishlistEmpty = document.getElementById('wishlist-empty');
+            
+            // Update count
+            wishlistCount.textContent = wishlistItems.length;
+            
+            // Clear current items
+            wishlistItemsContainer.innerHTML = '';
+            
+            // Show empty message if no items
+            if (wishlistItems.length === 0) {
+                wishlistItemsContainer.appendChild(wishlistEmpty);
+                return;
+            }
+            
+            // Add items to wishlist
+            wishlistItems.forEach(id => {
+                const product = products[id];
+                const itemElement = document.createElement('div');
+                itemElement.className = 'wishlist-item';
+                itemElement.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="wishlist-item-image">
+                    <div class="wishlist-item-details">
+                        <h4 class="wishlist-item-name">${product.name}</h4>
+                        <p class="wishlist-item-price">${product.price}</p>
+                    </div>
+                    <button class="wishlist-item-remove" onclick="removeFromWishlist('${id}')">×</button>
+                `;
+                wishlistItemsContainer.appendChild(itemElement);
+            });
+        }
+        
+        // Initialize snow on page load
+        window.addEventListener('load', createSnow);
+    </script>
 </body>
 </html>
