@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .title {
+            font-size: 4rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 0 10px #9d4edd, 0 0 20px #9d4edd, 0 0 30px #9d4edd;
+            margin-bottom: 3rem;
+        }
+
+        .keys-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 0 auto;
+            max-width: 1200px;
+            padding: 0 1rem;
+        }
+
+        .key-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .key-image {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #fff, 0 0 15px #fff;
+            margin-bottom: 1rem;
+        }
+
+        .key-label {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .keys-container {
+                flex-direction: column;
+            }
+            
+            .title {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">Nebula</h1>
+    
+    <div class="keys-container">
+        <div class="key-item">
+            <img src="/placeholder.svg?height=200&width=200" alt="1 Week Key" class="key-image">
+            <div class="key-label">1 Week Key</div>
+        </div>
+        
+        <div class="key-item">
+            <img src="/placeholder.svg?height=200&width=200" alt="1 Month Key" class="key-image">
+            <div class="key-label">1 Month Key</div>
+        </div>
+        
+        <div class="key-item">
+            <img src="/placeholder.svg?height=200&width=200" alt="6 Months Key" class="key-image">
+            <div class="key-label">6 Months Key</div>
+        </div>
+    </div>
+</body>
+</html>
